@@ -1,0 +1,81 @@
+Desktop Side Requirements:
+1. A Graphical interface is rendered of the form:
+	 LED #1  LED #2  LED #3
+   Red   <Input> <Input> <Input>
+   Green <Input> <Input> <Input>  <Send>
+   Blue  <Input> <Input> <Input>
+
+
+2. When the send button is pressed the values of each
+TKinter Widget are mapped to the
+range 0-255 (values < 0 become 0 and values > 255 become 255) and stored in a 2-dimensional array of the form:
+	[[r1, g1, b1],
+	 [r2, g2, b2],
+	 [r3, g3, b3]]
+
+
+
+3. After storing the values in the two dimensional array, the array is
+converted to a string of the form:
+	"[[r1, g1, b1],
+	  [r2, g2, b2],
+	  [r3, g3, b3]]"
+
+4. The resultant string is transmitted as a websocket message to the raspberry
+pi
+
+
+5. If the websocket connection does not establish correctly an exception is
+thrown and the desktop stops attempting  to connect
+
+
+Embedded Side Requirements
+1. A websocket server will be created at the host address
+
+2. The server will actively await new connections from the desktop machine
+
+3. Upon opening of the connection to the host machine the server will wait
+for the reception of a string of the form:
+	"[[r1, g1, b1],
+	  [r2, g2, b2],
+	  [r3, g3, b3]]"
+
+4. The received string should then be parsed into a 2-dimensional array of the
+form:
+ 	[[r1, g1, b1],
+	 [r2, g2, b2],
+	 [r3, g3, b3]]
+
+5. Each sub array of the 2-dimensional array will be translated into 3 PWM
+signals for each LED
+
+
+AUTO
+
+
+
+
+
+Desktop Side:
+
+make_connection(ip,port)
+2. IF connection(ip, port) != ConnectionRefusedError THEN
+        return Websocket Object
+   ELSE
+        return FALSE
+
+3. WHEN <SEND>
+
+
+Server Side:
+
+
+3. IF validate_string PASS ("[[\d, \d, \d], [\d, \d, \d], [\d, \d, \d]]")
+	return TRUE
+   ELSE
+	return FALSE
+
+4. IF parse_string ("[[\d, \d, \d], [\d, \d, \d], [\d, \d, \d]]")
+	return [[\d, \d, \d],
+		[\d, \d, \d],
+		[\d, \d, \d]]
