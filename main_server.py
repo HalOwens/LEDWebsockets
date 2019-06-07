@@ -3,7 +3,7 @@ import asyncio
 import websockets
 
 """Server Constants"""
-ip_s = "10.30.128.92"
+ip_s = "10.0.1.8"
 port_s = 5678
 
 # https://raspberrypi.stackexchange.com/questions/298/can-i-use-the-gpio-for-pulse-width-modulation-pwm
@@ -11,7 +11,7 @@ port_s = 5678
 
 async def validate_string(str):
     """
-    Verifies that the received string is of the form [[r1, g1, b1], [r2, g2, b2], [r3, g3, b3]]
+    Takes argument str and verifies that it is of the form [[r1, g1, b1], [r2, g2, b2], [r3, g3, b3]]
     Returns true if the string is valid and false if invalid
     """
     str_r = regex.match(r'(\[?\[\d, \d, \d\],? ?\]?)', str)
@@ -36,7 +36,6 @@ async def parse_string(str):
     return buffer
 
 
-
 async def receive_data(websocket):
     """
     Called when a client is connected. Waits for a string to be transmitted
@@ -47,7 +46,6 @@ async def receive_data(websocket):
     if await validate_string(data):
         data = await parse_string(data)
     return data
-
 
 
 def update_led(rgb_values):
@@ -68,7 +66,7 @@ async def main(websocket, port):
     update_led(rgb_values)
 
 
-if __name__ == '_main__':
+if __name__ == '__main__':
     """
     Establishes the websocket server at ws://ip:port and creates the asyncio event loop
     """

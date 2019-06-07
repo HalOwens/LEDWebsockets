@@ -9,7 +9,7 @@ class EmptyFieldError(Exception):
 
 
 """Server Constants"""
-ip = "10.30.128.92"
+ip = "10.0.1.8"
 port = 5678
 
 """Tkinter vars"""
@@ -19,9 +19,7 @@ status = StringVar()
 
 async def set_status(str):
     """
-    Replaces the multiple calls to this code pattern which was used to update
-        the status indicator text in the UI
-    Returns void
+    Takes the argument str and adds it to the GUI above the send button then returns void
     """
     status.set(str)
     root.update()
@@ -51,10 +49,9 @@ async def create_buffer():
         raise EmptyFieldError
 
 
-
 async def send_data(buffer):
     """
-    Connects to the server ws://ip:port and transmits buffer as a str
+    Takes the argument buffer, connects to the server ws://ip:port and sends buffer as a string
     Returns true if data is successfully transmitted false if transmission fails for any reason
     """
     await set_status("Connecting...")
@@ -77,8 +74,7 @@ async def send_data(buffer):
 
 def send(*args):
     """
-    Function that is bound to the <send> button needed because a button cannot be bound
-        to and asynchronous function
+    Function that is called when the send button is pressed, exist to asynchronously call other functions
     Returns void
     """
     try:
@@ -89,9 +85,11 @@ def send(*args):
 
 
 if __name__ == '__main__':
+    """Add title and EXB Logo to top bar"""
     root.title("LED Manager")
     root.iconbitmap('exbICO.ico')
 
+    """Establishes basic formatting for the TKinter frame"""
     mainframe = ttk.Frame(root, padding=".3i")
     mainframe.grid(column=0, row=0)
     root.columnconfigure(0, weight=1)
@@ -124,7 +122,6 @@ if __name__ == '__main__':
     """Draw TKinter Frame"""
     for child in mainframe.winfo_children():
         child.grid_configure(padx=5, pady=5)
-
 
     """Main Loop"""
     while True:
