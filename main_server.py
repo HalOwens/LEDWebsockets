@@ -1,13 +1,17 @@
 import regex
 import asyncio
 import websockets
+import wiringpi
+
+
 
 """Server Constants"""
-ip_s = "10.0.1.8"
+ip_s = "192.168.192.239"
 port_s = 5678
 
-# https://raspberrypi.stackexchange.com/questions/298/can-i-use-the-gpio-for-pulse-width-modulation-pwm
 
+
+# https://raspberrypi.stackexchange.com/questions/298/can-i-use-the-gpio-for-pulse-width-modulation-pwm
 
 async def validate_string(str):
     """
@@ -48,28 +52,49 @@ async def receive_data(websocket):
     return data
 
 
-def update_led(rgb_values):
+def update_led(led_pins, rgb_values):
     """
     Changes the values of the PWM signals to the LEDs based off of the values in rgb_values
     Returns void
     """
+    for i in range(3):
+        setColor(led_pins[i], rgb_values[i])
     print("updating the LEDS with")
     print(rgb_values)
 
+
+def setColor(pins, rgb):
+    """
+    Takes two arguments: pins and rgb. Pins contains the three pins connected to a specific led and
+    rgb contains the three color values for that LED
+    Returns void
+    """
+    for pinToWrite in pins:
+        wiringpi.pinMode(pinToWrite, 1)
+        wiringpi.softPwmCreate(pinToWrite, 0 , 255 )
+        for color in rgb:
+            wiringpi.softPmwWrite(pinToWrite, color)
+            #May need a small delay after call of this
+            #wiringpi.delay(5)
 
 async def main(websocket, port):
     """
     Is called by the websocket handler when a client connects to the server
     Returns void
     """
+        #placeholder numbers
+    led_pins = [[1 2 3]
+                [4 5 6]
+                [7 8 9]]
     rgb_values = await asyncio.create_task(receive_data(websocket))
-    update_led(rgb_values)
+    update_led(led_pins, rgb_values)
 
 
 if __name__ == '__main__':
     """
     Establishes the websocket server at ws://ip:port and creates the asyncio event loop
     """
+    wiringpi.wiringPiSetup()
     server = websockets.serve(main, ip_s, port_s)
     print("Server established at ws://{}:{}".format(ip_s, port_s))
     asyncio.get_event_loop().run_until_complete(server)

@@ -9,7 +9,7 @@ class EmptyFieldError(Exception):
 
 
 """Server Constants"""
-ip = "10.0.1.8"
+ip = "192.168.192.239"
 port = 5678
 
 """Tkinter vars"""
