@@ -83,9 +83,9 @@ async def main(websocket, port):
     Returns void
     """
         #placeholder numbers
-    led_pins = [[1 2 3]
-                [4 5 6]
-                [7 8 9]]
+    led_pins = [[2, 3, 4],
+                [17, 27, 22],
+                [10, 9, 11]]
     rgb_values = await asyncio.create_task(receive_data(websocket))
     update_led(led_pins, rgb_values)
 
