@@ -1,81 +1,88 @@
-Desktop Side Requirements:
-1. A Graphical interface is rendered of the form:
-	 LED #1  LED #2  LED #3
-   Red   <Input> <Input> <Input>
-   Green <Input> <Input> <Input>  <Send>
-   Blue  <Input> <Input> <Input>
+General commentary
+    Components of the grammar (IF, THEN, ELSE, ENDIF, etc) are identified in all capital letters
+    The grammar is not applied on requires whose TEST_TYPE = MANUAL
+    Local variables are identified in lower case 
+    Global variables are identified in lower case and prepended with an apostrophe (')
 
+REQ-CLIENT-1
+TEST_TYPE: MANUAL
+FUNCTION : N/A
+INPUT    : N/A
+OUTPUT   : N/A
+DESC     : This requirement describes how the display of the client is constructed
+The client shall display display a graphical interface with the following format:
 
-2. When the send button is pressed the values of each
-TKinter Widget are mapped to the
-range 0-255 (values < 0 become 0 and values > 255 become 255) and stored in a 2-dimensional array of the form:
-	[[r1, g1, b1],
-	 [r2, g2, b2],
-	 [r3, g3, b3]]
+	     LED #1    LED #2    LED #3
+   Red   <'Input1> <'Input4> <'Input7>
+   Green <'Input2> <'Input5> <'Input8>  <Send Button>
+   Blue  <'Input3> <'Input6> <'Input9>
 
+REQ-CLIENT-2
+TEST_TYPE: AUTO
+FUNCTION : build_string
+INPUT    : N/A
+OUTPUT   : N/A
+DESC     : The build_string function constructs a string of RGB values in the format that the server expects to receive the values in
+           based on the data in the GUI
+'tx_string = "[['Input1,'Input2,'Input3],['Input4,'Input5,'Input6],['Input7,'Input8,'Input9]]
 
+REQ-CLIENT-3
+TEST_TYPE: MANUAL
+FUNCTION : send
+INPUT    : N/A
+OUTPUT   : N/A
+DESC     : The send function transmits the string constructed by build_string to the server for processing
+The send function shall transmit 'tx_string to the server using the websockets library
 
-3. After storing the values in the two dimensional array, the array is
-converted to a string of the form:
-	"[[r1, g1, b1],
-	  [r2, g2, b2],
-	  [r3, g3, b3]]"
+TODO add a requirement for bounding the RGB values
+   
+REQ-SERVER-1
+TEST_TYPE: AUTO
+FUNCTION : validate_string
+INPUT    : color_string
+OUTPUT   : boolean
+DESC     : This function takes an input string and validates its format, setting the _vld variables to the parsed values from
+           the input string. In the case of invalid input, all rgb values are set to (255,0,0).
+IF 'color_string = "[[r1,b1,g1],[r2,g2,b2],[r3,g3,b3]]"  THEN
+    'r1_vld = r1
+    'b1_vld = b1
+    'g1_vld = g1
+    
+    'r2_vld = r2
+    'b2_vld = b2
+    'g2_vld = g2
+    
+    'r3_vld = r2
+    'b3_vld = b2
+    'g3_vld = g2
+    
+    RETURN true
+ELSE    
+    'r1_vld = 255
+    'b1_vld = 0
+    'g1_vld = 0
+    
+    'r2_vld = 255
+    'b2_vld = 0
+    'g2_vld = 0
+    
+    'r3_vld = 255
+    'b3_vld = 0
+    'g3_vld = 0
 
-4. The resultant string is transmitted as a websocket message to the raspberry
-pi
+    RETURN false
+ENDIF
 
+REQ-SERVER-2
+TEST_TYPE: MANUAL
+FUNCTION : set_color
+INPUT    : N/A
+OUTPUT   : N/A
+DESC     : This function updates the pulse width modulation of each LED pin based on the values in the 'rN_vld, 'gN_vld, and 'bN_vld variables
+           It must be verified manually because an inspection that the LED was set to the appropriate values is required
 
-5. If the websocket connection does not establish correctly an exception is
-thrown and the desktop stops attempting  to connect
+Set LED1 color equal to ('r1_vld,'g1_vld,'b1_vld)
+Set LED2 color equal to ('r2_vld,'g2_vld,'b2_vld)
+Set LED3 color equal to ('r3_vld,'g3_vld,'b3_vld)
 
-
-Embedded Side Requirements
-1. A websocket server will be created at the host address
-
-2. The server will actively await new connections from the desktop machine
-
-3. Upon opening of the connection to the host machine the server will wait
-for the reception of a string of the form:
-	"[[r1, g1, b1],
-	  [r2, g2, b2],
-	  [r3, g3, b3]]"
-
-4. The received string should then be parsed into a 2-dimensional array of the
-form:
- 	[[r1, g1, b1],
-	 [r2, g2, b2],
-	 [r3, g3, b3]]
-
-5. Each sub array of the 2-dimensional array will be translated into 3 PWM
-signals for each LED
-
-
-AUTO
-
-
-
-
-
-Desktop Side:
-
-make_connection(ip,port)
-2. IF connection(ip, port) != ConnectionRefusedError THEN
-        return Websocket Object
-   ELSE
-        return FALSE
-
-3. WHEN <SEND>
-
-
-Server Side:
-
-
-3. IF validate_string PASS ("[[\d, \d, \d], [\d, \d, \d], [\d, \d, \d]]")
-	return TRUE
-   ELSE
-	return FALSE
-
-4. IF parse_string ("[[\d, \d, \d], [\d, \d, \d], [\d, \d, \d]]")
-	return [[\d, \d, \d],
-		[\d, \d, \d],
-		[\d, \d, \d]]
+TODO Add server side manual requirement saying that the server will receive data using the websockets library and populate it into a string
