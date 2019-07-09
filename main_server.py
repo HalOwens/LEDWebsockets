@@ -6,7 +6,7 @@ import wiringpi
 
 
 """Server Constants"""
-ip_s = "192.168.192.239"
+ip_s = "10.30.21.65"
 port_s = 5678
 
 
@@ -47,8 +47,11 @@ async def receive_data(websocket):
     """
     print("New client connected")
     data = await websocket.recv()
-    if await validate_string(data):
-        data = await parse_string(data)
+    #if await validate_string(data):
+    data = await parse_string(data)
+    print("Hello")
+    print(type(data))
+    print(data)
     return data
 
 
@@ -69,13 +72,12 @@ def setColor(pins, rgb):
     rgb contains the three color values for that LED
     Returns void
     """
-    for pinToWrite in pins:
-        wiringpi.pinMode(pinToWrite, 1)
-        wiringpi.softPwmCreate(pinToWrite, 0 , 255 )
-        for color in rgb:
-            wiringpi.softPmwWrite(pinToWrite, color)
-            #May need a small delay after call of this
-            #wiringpi.delay(5)
+    print(pins)
+    print(rgb)
+    for i in range(0,3):
+        wiringpi.pinMode(pins[i], 1)
+        wiringpi.softPwmCreate(pins[i], 0, 255)
+        wiringpi.softPwmWrite(pins[i], rgb[i])
 
 async def main(websocket, port):
     """
@@ -83,10 +85,11 @@ async def main(websocket, port):
     Returns void
     """
         #placeholder numbers
-    led_pins = [[2, 3, 4],
-                [17, 27, 22],
-                [10, 9, 11]]
+    led_pins = [[0, 2, 3],
+                [1, 4, 5],
+                [21, 22, 23]]
     rgb_values = await asyncio.create_task(receive_data(websocket))
+    print(type(rgb_values))
     update_led(led_pins, rgb_values)
 
 
@@ -99,3 +102,4 @@ if __name__ == '__main__':
     print("Server established at ws://{}:{}".format(ip_s, port_s))
     asyncio.get_event_loop().run_until_complete(server)
     asyncio.get_event_loop().run_forever()
+
