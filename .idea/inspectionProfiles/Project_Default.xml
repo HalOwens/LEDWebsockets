@@ -4,10 +4,16 @@
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="3">
+          <list size="9">
             <item index="0" class="java.lang.String" itemvalue="AUTO" />
             <item index="1" class="java.lang.String" itemvalue="pi" />
             <item index="2" class="java.lang.String" itemvalue="ELSE" />
+            <item index="3" class="java.lang.String" itemvalue="REQ-CLIENT-1" />
+            <item index="4" class="java.lang.String" itemvalue="REQ-CLIENT-2" />
+            <item index="5" class="java.lang.String" itemvalue="ENDIF" />
+            <item index="6" class="java.lang.String" itemvalue="REQ-CLIENT-3" />
+            <item index="7" class="java.lang.String" itemvalue="REQ-SERVER-1" />
+            <item index="8" class="java.lang.String" itemvalue="REQ-SERVER-2" />
           </list>
         </value>
       </option>

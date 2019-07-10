@@ -9,12 +9,17 @@ class EmptyFieldError(Exception):
 
 
 """Server Constants"""
-ip = "192.168.192.239"
+ip = "10.30.21.64"
 port = 5678
 
 """Tkinter vars"""
 root = Tk()
 status = StringVar()
+tx_string = ""
+
+
+def get_tx_string():
+    return tx_string
 
 
 async def set_status(str):
@@ -26,24 +31,26 @@ async def set_status(str):
     await asyncio.sleep(.8)
 
 
-async def create_buffer():
+async def build_string(data_l):
     """
     Maps the values of the StringVar()s inside of Data to integer data
         if a value is > 255 it is set to 255
         if a value is < 0 it is set to 0
     Returns buffer if all data fields are full else it raises an EmptyFieldError exception"
     """
+    global tx_string
     buffer = [[0 for i in range(3)] for i in range (3)]
     try:
         for i in range(3):
             for j in range(3):
-                val = int(data[i][j].get())
-                if 0 < val < 255:
-                    buffer[i][j] = val
+                val = int(data_l[i][j].get())
+                if 0 <= val <= 255:
+                    buffer[i][j] = (val)
                 elif val >= 256:
                     buffer[i][j] = 255
                 else:
                     buffer[i][j] = 0
+        tx_string = str(buffer)
         return buffer
     except ValueError:
         raise EmptyFieldError
@@ -54,6 +61,7 @@ async def send_data(buffer):
     Takes the argument buffer, connects to the server ws://ip:port and sends buffer as a string
     Returns true if data is successfully transmitted false if transmission fails for any reason
     """
+    global tx_string
     await set_status("Connecting...")
     try:
         async with websockets.client.connect("ws://{}:{}".format(ip, port)) as websocket:
@@ -61,7 +69,8 @@ async def send_data(buffer):
             await set_status("Transmitting Values")
             print("Connection at ws://{}:{} established".format(ip, port))
             print("Transmitting RGB values")
-            await websocket.send(str(buffer))
+            print(tx_string)
+            await websocket.send(tx_string)
             await set_status("Data Transmitted ✓")
             print("Closing connection at ws://{}:{}".format(ip, port))
             websocket.close()
@@ -69,6 +78,10 @@ async def send_data(buffer):
     except ConnectionRefusedError:
         await set_status("Unable to Connect")
         print("Unable to connect to server at w://{}:{}".format(ip, port))
+        return False
+    except OSError:
+        await set_status("Unable to Connect")
+        print("OSError Thrown")
         return False
 
 
@@ -78,13 +91,15 @@ def send(*args):
     Returns void
     """
     try:
-        buffer = asyncio.run(create_buffer())
+        buffer = asyncio.run(build_string(data))
         asyncio.run(send_data(buffer))
     except EmptyFieldError:
         status.set("ERROR: Populate all fields with numbers")
 
 
 if __name__ == '__main__':
+    print()
+    #print(asyncio.run(build_string([[StringVar().set('1'), StringVar().set('2'), StringVar().set('3')], [StringVar().set('4'), StringVar().set('5'), StringVar().set('6')], [StringVar().set("7"), StringVar().set("8"), StringVar().set("9")]])))
     """Add title and EXB Logo to top bar"""
     root.title("LED Manager")
     root.iconbitmap('exbICO.ico')
