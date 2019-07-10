@@ -1,12 +1,12 @@
 import regex
 import asyncio
 import websockets
-#import wiringpi
+import wiringpi
 
 
 
 """Server Constants"""
-ip_s = "10.30.21.64"
+ip_s = "10.30.21.65"
 port_s = 5678
 
 r1_vld = 255
@@ -130,14 +130,14 @@ async def main(websocket, port):
                 [1, 4, 5],
                 [21, 22, 23]]
     rgb_values = await asyncio.create_task(receive_data(websocket))
-    update_led(led_pins, rgb_values)
+    update_led(led_pins)
 
 
 if __name__ == '__main__':
     """
     Establishes the websocket server at ws://ip:port and creates the asyncio event loop
     """
-   # wiringpi.wiringPiSetup()
+    wiringpi.wiringPiSetup()
     server = websockets.serve(main, ip_s, port_s)
     print("Server established at ws://{}:{}".format(ip_s, port_s))
     asyncio.get_event_loop().run_until_complete(server)
