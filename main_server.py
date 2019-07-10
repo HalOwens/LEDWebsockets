@@ -1,12 +1,12 @@
 import regex
 import asyncio
 import websockets
-import wiringpi
+#import wiringpi
 
 
 
 """Server Constants"""
-ip_s = "10.30.21.65"
+ip_s = "10.30.21.64"
 port_s = 5678
 
 r1_vld = 255
@@ -22,6 +22,18 @@ g3_vld = 0
 b3_vld = 0
 
 # https://raspberrypi.stackexchange.com/questions/298/can-i-use-the-gpio-for-pulse-width-modulation-pwm
+
+
+def get_colors():
+    yield r1_vld
+    yield g1_vld
+    yield b1_vld
+    yield r2_vld
+    yield g2_vld
+    yield b2_vld
+    yield r3_vld
+    yield g3_vld
+    yield b3_vld
 
 async def validate_string(str):
     """
@@ -40,7 +52,6 @@ async def validate_string(str):
     global g3_vld
     global b3_vld
     str_r = regex.match(r'(\[?\[\d{1,3}, \d{1,3}, \d{1,3}\],? ?\]?)', str)
-    print(str_r)
     if str_r is None:
         return False
     else:
@@ -100,25 +111,13 @@ def update_led(led_pins):
     rgb_values[2][2] = b3_vld
     for x in range(3):
         for y in range(3):
-            wiringpi.pinMode(led_pins[x][y], 1)
-            wiringpi.softPwmCreate(led_pins[x][y], 0, 255)
-            wiringpi.softPwmWrite(led_pins[x][y], 255-rgb_values[x][y])
+            nil
+            #wiringpi.pinMode(led_pins[x][y], 1)
+            #wiringpi.softPwmCreate(led_pins[x][y], 0, 255)
+            #wiringpi.softPwmWrite(led_pins[x][y], 255-rgb_values[x][y])
     print("updating the LEDS with")
     print(rgb_values)
 
-
-def setColor(pins, rgb):
-    """
-    Takes two arguments: pins and rgb. Pins contains the three pins connected to a specific led and
-    rgb contains the three color values for that LED
-    Returns void
-    """
-#    print(pins)
-#    print(rgb)
-#    for i in range(0,3):
-#        wiringpi.pinMode(pins[i], 1)
-#        wiringpi.softPwmCreate(pins[i], 0, 255)
-#        wiringpi.softPwmWrite(pins[i], 255-rgb[i])
 
 async def main(websocket, port):
     """
@@ -137,7 +136,8 @@ if __name__ == '__main__':
     """
     Establishes the websocket server at ws://ip:port and creates the asyncio event loop
     """
-    wiringpi.wiringPiSetup()
+    print(regex.match(r'(\[?\[\d{1,3}, \d{1,3}, \d{1,3}\],? ?\]?)', "[[1, 2, 3], [10, 11, 12], [110, 111, 112]]"))
+    #wiringpi.wiringPiSetup()
     server = websockets.serve(main, ip_s, port_s)
     print("Server established at ws://{}:{}".format(ip_s, port_s))
     asyncio.get_event_loop().run_until_complete(server)
