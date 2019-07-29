@@ -11,7 +11,7 @@ class EmptyFieldError(Exception):
     pass
 
 
-class Desktop():
+class Desktop:
     def __init__(self):
         """Server Constants"""
         self.ip = "10.30.21.64"

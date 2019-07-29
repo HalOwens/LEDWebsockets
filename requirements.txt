@@ -4,29 +4,34 @@ General commentary
     Local variables are identified in lower case 
     Global variables are identified in lower case and prepended with an apostrophe (')
 
-REQ-CLIENT-1
+REQ
 TEST_TYPE: MANUAL
 FUNCTION : N/A
 INPUT    : N/A
 OUTPUT   : N/A
 DESC     : This requirement describes how the display of the client is constructed
 The client shall display display a graphical interface with the following format:
-
+CODE:
 	     LED #1    LED #2    LED #3
    Red   <'Input1> <'Input4> <'Input7>
    Green <'Input2> <'Input5> <'Input8>  <Send Button>
    Blue  <'Input3> <'Input6> <'Input9>
-
-REQ-CLIENT-2
+CODE
+REQ
 TEST_TYPE: AUTO
-FUNCTION : build_string
+FILE     : main_desktop.py
+FUNCTION : Desktop.build_string
 INPUT    : N/A
 OUTPUT   : N/A
 DESC     : The build_string function constructs a string of RGB values in the format that the server expects to receive the values in
            based on the data in the GUI
-'tx_string = "[['Input1,'Input2,'Input3],['Input4,'Input5,'Input6],['Input7,'Input8,'Input9]]
+CODE:
+IF 'input[x] < 0 THEN 'input[x] = 0 WHERE X = 1-9
+IF 'input[x] > 255 THEN 'input[x] = 255 WHERE x = 1-9
+'tx_string = "[['input1,'input2,'input3],['input4,'input5,'input6],['input7,'input8,'input9]]
+CODE
 
-REQ-CLIENT-3
+REQ
 TEST_TYPE: MANUAL
 FUNCTION : send
 INPUT    : N/A
@@ -34,15 +39,16 @@ OUTPUT   : N/A
 DESC     : The send function transmits the string constructed by build_string to the server for processing
 The send function shall transmit 'tx_string to the server using the websockets library
 
-TODO add a requirement for bounding the RGB values
-   
-REQ-SERVER-1
+
+REQ
 TEST_TYPE: AUTO
+FILE     : main_server.py
 FUNCTION : validate_string
 INPUT    : color_string
 OUTPUT   : boolean
 DESC     : This function takes an input string and validates its format, setting the _vld variables to the parsed values from
            the input string. In the case of invalid input, all rgb values are set to (255,0,0).
+CODE:
 IF 'color_string = "[[r1,b1,g1],[r2,g2,b2],[r3,g3,b3]]"  THEN
     'r1_vld = r1
     'b1_vld = b1
@@ -72,17 +78,19 @@ ELSE
 
     RETURN false
 ENDIF
+CODE
 
-REQ-SERVER-2
+REQ
 TEST_TYPE: MANUAL
 FUNCTION : set_color
 INPUT    : N/A
 OUTPUT   : N/A
-DESC     : This function updates the pulse width modulation of each LED pin based on the values in the 'rN_vld, 'gN_vld, and 'bN_vld variables
+DESC: This function updates the pulse width modulation of each LED pin based on the values in the 'rN_vld, 'gN_vld, and 'bN_vld variables
            It must be verified manually because an inspection that the LED was set to the appropriate values is required
 
+CODE:
 Set LED1 color equal to ('r1_vld,'g1_vld,'b1_vld)
 Set LED2 color equal to ('r2_vld,'g2_vld,'b2_vld)
 Set LED3 color equal to ('r3_vld,'g3_vld,'b3_vld)
-
-TODO Add server side manual requirement saying that the server will receive data using the websockets library and populate it into a string
+CODE
+REQ
