@@ -17,6 +17,8 @@ CODE:
    Green <'Input2> <'Input5> <'Input8>  <Send Button>
    Blue  <'Input3> <'Input6> <'Input9>
 CODE
+
+
 REQ
 TEST_TYPE: AUTO
 FILE     : main_desktop.py

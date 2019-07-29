@@ -1,10 +1,8 @@
 import re
 
 
-
-
 class Requirement:
-    keywords = r"IF |< |> |= |THEN |-"
+    """Requirement Variables"""
     TEST_TYPE = ""
     FILE = ""
     FUNCTION = ""
@@ -12,6 +10,12 @@ class Requirement:
     OUTPUT = ""
     DESC = ""
     CODE = ""
+
+    """Keywords of the requirement language"""
+    keywords = r"IF |< |> |= |THEN |-"
+    """The auto generated code"""
+    generatedCode = ""
+
 
     def print_all(self):
         print(self.TEST_TYPE)
@@ -23,8 +27,23 @@ class Requirement:
         print(self.CODE)
 
     def split_keywords(self):
-        print(type(self.CODE[0][0]))
-        print(re.split(self.keywords, self.CODE[0][0]))
+        return re.split(self.keywords, self.CODE)
+
+    def build_import_list(self):
+        self.generatedCode += "import " + self.FILE.split(".")[0] + "\n"
+        with open(self.FILE) as file_f:
+            file = file_f.read()
+            self.generatedCode += re.split(r"\n\n", file, maxsplit=1)[0]
+        self.generatedCode += "\n\n"
+
+    def build_test_class(self):
+        self.generatedCode += "\nclass Test(unittest.TestCase):\n\n"
+
+    def build_main(self):
+        self.generatedCode += "\nif __name__ == '__main__':\n"
+        ##How can I make sure this isn't always hardcoded?
+        self.generatedCode += "\tTk()\n"
+        self.generatedCode += "\tunittest.main()\n"
 
 
 def get_req_blocks(reqs):
@@ -43,15 +62,16 @@ def classify_reqs(reqs):
     reqObjects = []
     for req in reqs:
         obj = Requirement()
-        obj.TEST_TYPE = re.findall(r'(?<=TEST_TYPE)(?: *: *)(.*)', req)
-        obj.FILE = re.findall(r'(?<=FILE)(?: *: *)(.*)', req)
-        obj.FUNCTION = re.findall(r'(?<=FUNCTION)(?: *: *)(.*)', req)
-        obj.INPUT = re.findall(r'(?<=INPUT)(?: *: *)(.*)', req)
-        obj.OUTPUT = re.findall(r'(?<=OUTPUT)(?: *: *)(.*)', req)
-        obj.DESC = re.findall(r'(?<=DESC)(?: *: *)(.*)', req)
-        obj.CODE = re.findall(r'(?<=CODE)(?: *: *\n)((.|\n)*?(?=CODE))', req)
+        obj.TEST_TYPE = re.findall(r'(?<=TEST_TYPE)(?: *: *)(.*)', req)[0]
+        obj.FILE = re.findall(r'(?<=FILE)(?: *: *)(.*)', req)[0]
+        obj.FUNCTION = re.findall(r'(?<=FUNCTION)(?: *: *)(.*)', req)[0]
+        obj.INPUT = re.findall(r'(?<=INPUT)(?: *: *)(.*)', req)[0]
+        obj.OUTPUT = re.findall(r'(?<=OUTPUT)(?: *: *)(.*)', req)[0]
+        obj.DESC = re.findall(r'(?<=DESC)(?: *: *)(.*)', req)[0]
+        obj.CODE = re.findall(r'(?<=CODE)(?: *: *\n)((.|\n)*?(?=CODE))', req)[0][0]
         reqObjects.append(obj)
     return reqObjects
+
 
 if __name__ == '__main__':
     reqObjects = 0
@@ -59,5 +79,9 @@ if __name__ == '__main__':
         requirements = requirements_f.read()
         requirements = get_req_blocks(requirements)
         autoRequirements = remove_manual_test(requirements)
-        reqObjects= classify_reqs(autoRequirements)
-        reqObjects[0].split_keywords()
+        reqObjects = classify_reqs(autoRequirements)
+    #reqObjects[0].print_all()
+    reqObjects[0].build_import_list()
+    reqObjects[0].build_test_class()
+    reqObjects[0].build_main()
+    print(reqObjects[0].generatedCode)
