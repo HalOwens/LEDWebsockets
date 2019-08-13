@@ -22,15 +22,15 @@ CODE
 REQ
 TEST_TYPE: AUTO
 FILE     : main_desktop.py
-FUNCTION : Desktop.build_string
+FUNCTION : build_string
 INPUT    : N/A
 OUTPUT   : N/A
 DESC     : The build_string function constructs a string of RGB values in the format that the server expects to receive the values in
            based on the data in the GUI
 CODE:
-IF 'input[x] < 0 THEN 'input[x] = 0 WHERE X = 1-9
-IF 'input[x] > 255 THEN 'input[x] = 255 WHERE x = 1-9
-'tx_string = "[['input1,'input2,'input3],['input4,'input5,'input6],['input7,'input8,'input9]]
+IF input(1-9) < 0 THEN input(1-9) = 0
+IF input(1-9) > 255 THEN input(1-9) = 255
+ASSERT tx_string = "[[input1,input2,input3],[input4,input5,input6],[input7,input8,input9]]"
 CODE
 
 REQ
